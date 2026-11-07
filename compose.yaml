@@ -1,0 +1,56 @@
+name: cadence
+
+x-app: &app
+  build:
+    context: .
+    dockerfile: Dockerfile.dev
+  image: cadence-dev
+  environment: &app_environment
+    CADENCE_MYSQL_SOCK: /run/mysqld/mysqld.sock
+    CADENCE_MYSQL_USERNAME: ${CADENCE_MYSQL_USERNAME:-root}
+    CADENCE_MYSQL_PASSWORD: ${CADENCE_MYSQL_PASSWORD:-}
+    RAILS_ENV: development
+    RAILS_LOG_TO_STDOUT: "1"
+    PORT: "3000"
+    CADENCE_MAILER_PORT: ${CADENCE_PORT:-3000}
+  volumes:
+    - .:/rails
+    - ${CADENCE_MYSQL_SOCKET_DIR:-/run/mysqld}:/run/mysqld
+    - bundle:/bundle
+    - rails_tmp:/rails/tmp
+
+services:
+  setup:
+    <<: *app
+    command: ["bin/setup", "--skip-server"]
+
+  web:
+    <<: *app
+    command: ["bin/rails", "server", "-b", "0.0.0.0", "--pid", "/tmp/cadence-server.pid"]
+    depends_on:
+      setup:
+        condition: service_completed_successfully
+    ports:
+      - "127.0.0.1:${CADENCE_PORT:-3000}:3000"
+    stdin_open: true
+    tty: true
+
+  jobs:
+    <<: *app
+    command: ["bin/jobs-dev"]
+    depends_on:
+      setup:
+        condition: service_completed_successfully
+    stop_grace_period: 45s
+
+  css:
+    <<: *app
+    command: ["bin/rails", "tailwindcss:watch"]
+    depends_on:
+      setup:
+        condition: service_completed_successfully
+    tty: true
+
+volumes:
+  bundle:
+  rails_tmp:

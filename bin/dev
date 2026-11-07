@@ -1,0 +1,14 @@
+#!/usr/bin/env ruby
+# frozen_string_literal: true
+
+ENV['RAILS_ENV'] ||= 'development'
+abort 'bin/dev is for development only.' unless ENV['RAILS_ENV'] == 'development'
+ENV['PORT'] ||= '3000'
+ENV['RUBY_DEBUG_LAZY'] ||= 'true'
+
+Dir.chdir File.expand_path('..', __dir__) do
+  abort 'Dependencies are missing. Run bin/setup --skip-server first.' unless system('bundle', 'check')
+  puts 'Starting Cadence web, CSS, and background jobs...'
+  $stdout.flush
+  exec 'bundle', 'exec', 'foreman', 'start', '-f', 'Procfile.dev', '-t', '45', *ARGV
+end

@@ -1,0 +1,27 @@
+#!/usr/bin/env ruby
+# frozen_string_literal: true
+
+require 'optparse'
+
+options = { system: false }
+parser = OptionParser.new do |cli|
+  cli.banner = 'Usage: bin/ci [--system]'
+  cli.on('--system', 'Also run browser/system tests (requires explicit developer request)') { options[:system] = true }
+  cli.on('-h', '--help', 'Show this help') { puts cli; exit }
+end
+
+begin
+  parser.parse!
+  raise OptionParser::InvalidArgument, ARGV.join(' ') unless ARGV.empty?
+rescue OptionParser::ParseError => e
+  abort "#{e.message}\n#{parser}"
+end
+
+ENV['RAILS_ENV'] = 'test'
+ENV['CI'] = 'true'
+CI_OPTIONS = options.freeze
+Dir.chdir File.expand_path('..', __dir__)
+require_relative '../config/boot'
+require 'active_support/continuous_integration'
+CI = ActiveSupport::ContinuousIntegration
+require_relative '../config/ci'

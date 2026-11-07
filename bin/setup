@@ -1,0 +1,35 @@
+#!/usr/bin/env ruby
+# frozen_string_literal: true
+
+require 'optparse'
+
+options = { skip_server: false }
+parser = OptionParser.new do |cli|
+  cli.banner = 'Usage: bin/setup [--skip-server] (RAILS_ENV=development or test)'
+  cli.on('--skip-server', 'Prepare the app without starting processes') { options[:skip_server] = true }
+  cli.on('-h', '--help', 'Show this help') { puts cli; exit }
+end
+
+begin
+  parser.parse!
+  raise OptionParser::InvalidArgument, ARGV.join(' ') unless ARGV.empty?
+rescue OptionParser::ParseError => e
+  abort "#{e.message}\n#{parser}"
+end
+
+environment = ENV.fetch('RAILS_ENV', 'development')
+abort 'Setup supports development and test only.' unless %w[development test].include?(environment)
+
+Dir.chdir File.expand_path('..', __dir__) do
+  puts '== Installing dependencies =='
+  system('bundle', 'check') || system('bundle', 'install', exception: true)
+  puts "== Preparing #{environment} databases =="
+  system({ 'RAILS_ENV' => environment }, 'bin/rails', 'db:prepare', exception: true)
+  puts '== Building CSS =='
+  system({ 'RAILS_ENV' => environment }, 'bin/rails', 'tailwindcss:build', exception: true)
+
+  unless options[:skip_server] || environment == 'test'
+    $stdout.flush
+    exec 'bin/dev'
+  end
+end

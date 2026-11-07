@@ -1,0 +1,74 @@
+#!/usr/bin/env ruby
+# frozen_string_literal: true
+
+require 'bundler/setup'
+require 'listen'
+
+ROOT = File.expand_path('..', __dir__)
+WATCH_DIRS = %w[app config db lib bin].freeze
+WATCH_ROOT_FILES = %w[Gemfile Gemfile.lock config.ru].freeze
+
+ENV['RAILS_ENV'] ||= 'development'
+abort 'bin/jobs-dev is for development only.' unless ENV['RAILS_ENV'] == 'development'
+$stdout.sync = true
+
+events = Queue.new
+%w[INT TERM].each { |signal| Signal.trap(signal) { events << :stop } }
+
+def start_jobs(events)
+  puts 'Starting Solid Queue jobs...'
+  pid = Process.spawn('bundle', 'exec', 'bin/jobs', chdir: ROOT, pgroup: true)
+  monitor = Thread.new do
+    _, status = Process.wait2(pid)
+    events << [:exit, pid, status]
+    status
+  end
+  [pid, monitor]
+end
+
+def stop_jobs(pid, monitor)
+  return unless pid && monitor.alive?
+
+  Process.kill('TERM', pid)
+  return if monitor.join(35)
+
+  warn 'Worker shutdown timed out; stopping its process group.'
+  Process.kill('KILL', -pid)
+  monitor.join
+rescue Errno::ESRCH
+  monitor.join
+end
+
+listener = Listen.to(*WATCH_DIRS.map { |path| File.join(ROOT, path) }, wait_for_delay: 1) do
+  events << :restart
+end
+patterns = WATCH_ROOT_FILES.map { |path| /\A#{Regexp.escape(path)}\z/ }
+root_listener = Listen.to(ROOT, only: patterns) { events << :restart }
+
+pid = monitor = nil
+exit_status = 0
+begin
+  pid, monitor = start_jobs(events)
+  listener.start
+  root_listener.start
+
+  loop do
+    event = events.pop
+    break if event == :stop
+
+    if event == :restart
+      puts 'Rails code changed; restarting Solid Queue jobs...'
+      stop_jobs(pid, monitor)
+      pid, monitor = start_jobs(events)
+    elsif event[0] == :exit && event[1] == pid
+      warn 'Solid Queue exited; stopping the development watcher.'
+      exit_status = event[2].exitstatus || 1
+      break
+    end
+  end
+ensure
+  listener.stop
+  root_listener.stop
+  stop_jobs(pid, monitor)
+end
+exit exit_status

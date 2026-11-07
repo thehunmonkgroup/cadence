@@ -1,0 +1,83 @@
+plugins:
+  - rubocop-rails
+  - rubocop-performance
+  - rubocop-minitest
+  - rubocop-capybara
+
+inherit_mode:
+  merge:
+    - Exclude
+
+AllCops:
+  TargetRubyVersion: 4.0
+  NewCops: enable
+  SuggestExtensions: false
+  Exclude:
+    - db/schema.rb
+    - db/queue_schema.rb
+    - db/cache_schema.rb
+    - bin/*
+    - vendor/**/*
+
+Layout/LineLength:
+  Max: 120
+
+Metrics/AbcSize:
+  Max: 30
+  Exclude:
+    - config/**/*.rb
+    - db/**/*.rb
+
+Metrics/BlockLength:
+  Exclude:
+    - config/**/*.rb
+    - db/**/*.rb
+    - test/**/*.rb
+
+Metrics/ClassLength:
+  Max: 250
+  Exclude:
+    - db/**/*.rb
+    - test/**/*.rb
+
+Metrics/CyclomaticComplexity:
+  Max: 8
+  Exclude:
+    - config/**/*.rb
+    - db/**/*.rb
+
+Metrics/MethodLength:
+  Max: 35
+  Exclude:
+    - config/**/*.rb
+    - db/**/*.rb
+    - test/**/*.rb
+
+Metrics/ParameterLists:
+  Max: 6
+  Exclude:
+    - test/**/*.rb
+
+Metrics/PerceivedComplexity:
+  Max: 9
+  Exclude:
+    - config/**/*.rb
+    - db/**/*.rb
+
+Minitest/MultipleAssertions:
+  Enabled: false
+
+Naming/PredicatePrefix:
+  Enabled: false
+
+Rails/I18nLocaleTexts:
+  Enabled: false
+
+Style/Documentation:
+  Enabled: false
+
+Style/TrailingCommaInArrayLiteral:
+  EnforcedStyleForMultiline: comma
+
+Style/TrailingCommaInHashLiteral:
+  EnforcedStyleForMultiline: comma

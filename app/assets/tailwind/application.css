@@ -1,0 +1,15 @@
+@import "tailwindcss";
+
+@source not "./daisyui.mjs";
+@source not "../builds/**";
+@plugin "./daisyui.mjs" {
+  themes: light --default;
+}
+
+@layer base {
+  body { @apply bg-base-100 text-base-content; }
+}
+
+@layer components {
+  .heroicon { @apply inline-block size-5 shrink-0; }
+}

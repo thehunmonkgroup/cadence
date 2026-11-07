@@ -1,0 +1,7 @@
+interface:
+  display_name: "Rails Coding"
+  short_description: "Rails design and coding for Cadence"
+  default_prompt: "Use $rails-coding to plan or make a focused Rails change in Cadence."
+
+policy:
+  allow_implicit_invocation: true
