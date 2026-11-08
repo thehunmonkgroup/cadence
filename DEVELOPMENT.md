@@ -2,7 +2,7 @@
 
 ## Stack
 
-Ruby **4.0.5**, Rails **8.1.4.1**, MySQL/MariaDB, Solid Queue, Solid Cache, Importmap, Turbo, Stimulus, Tailwind CSS, and DaisyUI. Dependencies are locked in `Gemfile.lock`. Frontend assets do not require a Node.js build pipeline.
+Ruby, Rails, MySQL/MariaDB, Solid Queue, Solid Cache, Importmap, Turbo, Stimulus, Tailwind CSS, and DaisyUI. Dependencies are locked in `Gemfile.lock`. Frontend assets do not require a Node.js build pipeline.
 
 ## Local development
 
@@ -14,7 +14,7 @@ bin/setup
 
 Setup installs dependencies, prepares databases, builds CSS, and starts the web server, CSS watcher, and reloading job worker. Use `bin/setup --skip-server` for setup alone, then `bin/dev` for subsequent starts. Neither command resets data or clears logs. `RAILS_ENV=test bin/setup --skip-server` prepares only test databases.
 
-The default URL is `http://localhost:3000`. Use `PORT=3100 bin/dev` to change it. The default root page is Rails' development welcome page; `/up` is the health endpoint.
+The default URL is `http://localhost:3000`. Use `PORT=3100 bin/dev` to change it. `/up` is the health endpoint.
 
 Database connection settings:
 

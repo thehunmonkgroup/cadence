@@ -2,7 +2,7 @@
 
 Build a small Rails application around a deterministic availability engine, a reliable booking transaction, and one persistent client identity. Validate the scheduling rules against concrete calendars before building the full booking interface: that behavior is the user’s principal reason for replacing the current scheduler.
 
-This proposal describes the scheduling behavior still to be implemented. Scope and user intent are described in the [user story summary](user-story-executive-summary.md), based on the source requests `cadence-spec-1.wav` and `cadence-spec-2.txt`.
+This proposal describes the scheduling behavior still to be implemented. Scope and user intent are described in the [user story summary](user-story-executive-summary.md).
 
 ## Proposed implementation
 
@@ -22,7 +22,7 @@ Keep practitioner and client access separate. Clients may access only their own 
 
 ## The scheduling decision
 
-Model appointments as occupied time covering service plus 15 minutes of cleanup. Use half-open intervals so the next appointment may start exactly when cleanup ends. The phrase “75 minute gap” is interpreted as space for another 60-minute service plus cleanup, not a mandatory 75-minute idle period; the recording’s 2:15 p.m. example supports that interpretation.
+Model appointments as occupied time covering service plus 15 minutes of cleanup. Use half-open intervals so the next appointment may start exactly when cleanup ends. The phrase “75 minute gap” is interpreted as space for another 60-minute service plus cleanup, not a mandatory 75-minute idle period.
 
 Proposed rule, pending confirmation:
 
