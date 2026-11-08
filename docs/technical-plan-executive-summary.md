@@ -2,11 +2,11 @@
 
 Build a small Rails application around a deterministic availability engine, a reliable booking transaction, and one persistent client identity. Validate the scheduling rules against concrete calendars before building the full booking interface: that behavior is the user’s principal reason for replacing the current scheduler.
 
-This is a design proposal for a greenfield repository. No application, database, framework version, or provider integration has been implemented. Scope and user intent are described in the [user story summary](user-story-executive-summary.md), based on [the recording](../cadence-spec-1.wav) and [the follow-up](../cadence-spec-2.txt).
+This proposal describes the scheduling behavior still to be implemented. Scope and user intent are described in the [user story summary](user-story-executive-summary.md), based on the source requests `cadence-spec-1.wav` and `cadence-spec-2.txt`.
 
 ## Proposed implementation
 
-Use one Rails monolith with responsive, server-rendered pages and modest JavaScript for booking interactions. Start with one practitioner calendar. Select and pin Ruby/Rails versions, a relational database, authentication, and deployment tooling with the developer. Use conventional Minitest coverage and RuboCop once configured.
+Use the existing Rails application with responsive, server-rendered pages and modest JavaScript for booking interactions. Start with one practitioner calendar. Ruby, Rails, MySQL/MariaDB, Minitest, and RuboCop are configured; see the [development guide](../DEVELOPMENT.md). Authentication and deployment configuration remain open decisions.
 
 The main records are:
 
@@ -61,7 +61,7 @@ Choose one email provider and one SMS provider. Collect SMS permission and honor
 | Payment workflow | Is a saved card mandatory? When are services charged, at what prices/currency, and by whom? Are deposits, no-show fees, late-cancellation fees, or refunds required? Choose one processor initially; confirm Stripe. |
 | Client continuity and intake | Is email-link/code access acceptable? What fields and policy text are required, and must intake be completed before confirmation? Propose one fixed form, completed once, with later corrections possible. Are existing client/appointment records to be imported? No migration is assumed. |
 | Communications | Which channel sends booking confirmations, and what reminder offsets should be the initial defaults? Propose email confirmation plus separately configurable email/SMS reminders; confirm provider accounts and a contact route for late changes. |
-| Technical baseline and data | What Ruby/Rails versions, database, hosting, and practitioner authentication should be used? What sensitive information goes into forms/notes, and what retention is required? These choices affect implementation and operation. |
+| Hosting, authentication, and data | What hosting and practitioner authentication should be used? What sensitive information goes into forms/notes, and what retention is required? These choices affect implementation and operation. |
 
 ## Delivery sequence and verification
 
@@ -69,4 +69,4 @@ Choose one email provider and one SMS provider. Collect SMS permission and honor
 2. **Build the complete appointment loop.** Implement practitioner availability, email identity, client history, intake and notes, booking, and atomic cancellation/rescheduling. Verify simultaneous booking attempts, failed reschedules, access separation, cleanup, daylight-saving transitions, and the exact cutoff.
 3. **Add the required integrations and prepare for launch.** Complete saved-card/payment behavior, confirmation and both reminder channels. Verify duplicate submissions/events, payment failures where applicable, delivery retries, and cancellation/rescheduling after reminders have been queued. Review the short booking flow with the intended user.
 
-These are implementation stages, not separate product scope cuts: saved cards and both reminder channels remain part of the requested first release. Use focused model, service, request, job, and integration tests for the behavior implemented. Run RuboCop after code changes; run system tests only if explicitly requested. No application code or tests are part of this design task.
+These are implementation stages, not separate product scope cuts: saved cards and both reminder channels remain part of the requested first release. Use focused model, service, request, job, and integration tests for the behavior implemented.
